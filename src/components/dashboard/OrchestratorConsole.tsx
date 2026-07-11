@@ -86,4 +86,5 @@ export default function OrchestratorConsole() {
   );
 }
 // chore: add section marker for console header region
+// a11y: verify screen-reader accessible heading levels
 
