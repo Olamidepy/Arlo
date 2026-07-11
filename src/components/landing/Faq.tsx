@@ -71,4 +71,5 @@ export default function Faq() {
 }
 // docs: add FAQ section divider comments for readability
 // chore: ensure FAQ items use semantic dl, dt, dd elements
+// style: FAQ accordion uses smooth max-height CSS transition
 
