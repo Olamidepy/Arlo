@@ -1,4 +1,4 @@
-# Arlo: AI Venture Orchestrator on Stellar Soroban
+﻿# Arlo: AI Venture Orchestrator on Stellar Soroban
 
 Arlo is a modern, enterprise-grade AI Venture Orchestrator built on the **Stellar Network** and powered by **Soroban Smart Contracts**.
 
@@ -186,3 +186,5 @@ We welcome active contributions from the developer community! Here is how you ca
 ## 9. License
 
 This project is licensed under the MIT License. Details can be found in the LICENSE file.
+<!-- docs: add note about testnet faucet funding -->
+
