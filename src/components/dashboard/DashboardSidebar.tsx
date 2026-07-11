@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useArloStore } from '@/lib/store';
@@ -122,3 +122,5 @@ export default function DashboardSidebar({ activeTab, setActiveTab, className }:
     </aside>
   );
 }
+// refactor: document SidebarContent extraction rationale
+
