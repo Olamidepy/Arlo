@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -346,3 +346,5 @@ impl SorobanAgentEscrow {
     </div>
   );
 }
+// feat: add landing page section landmark comment
+
