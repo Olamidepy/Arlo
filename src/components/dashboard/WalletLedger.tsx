@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useArloStore } from '@/lib/store';
 import { Wallet, ArrowDownRight, ArrowUpRight, ShieldCheck, Coins } from 'lucide-react';
@@ -119,3 +119,5 @@ export default function WalletLedger() {
     </div>
   );
 }
+// chore: annotate wallet ledger component exports
+
