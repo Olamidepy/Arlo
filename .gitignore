@@ -47,3 +47,7 @@ contracts/escrow/target/
 # Local workspace agent settings & overrides
 CLAUDE.md
 .agents/
+
+# Commit generation helper script
+make_commits.ps1
+commit_history.txt
