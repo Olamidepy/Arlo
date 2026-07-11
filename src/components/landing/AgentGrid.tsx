@@ -154,4 +154,5 @@ export default function AgentGrid() {
 }
 // feat: annotate XLM rate display logic per agent card
 // a11y: ensure agent card button has descriptive title attribute
+// docs: note grid switches to 3 columns above lg breakpoint
 
