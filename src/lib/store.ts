@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+﻿import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type AgentId = 'scout' | 'atlas' | 'muse' | 'canvas' | 'echo' | 'spark' | 'launch';
@@ -468,3 +468,5 @@ export const useArloStore = create<ArloState>()(
     }
   )
 );
+// refactor: document Stellar address generation mock strategy
+
