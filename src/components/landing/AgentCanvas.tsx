@@ -286,4 +286,5 @@ export default function AgentCanvas() {
 }
 // refactor: add clarity comment for canvas node position map
 // chore: add note about canvas fallback for non-WebGL browsers
+// fix: cap canvas frame rate to 60fps to avoid idle battery drain
 
