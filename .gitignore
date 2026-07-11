@@ -1,4 +1,4 @@
-﻿# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
 /node_modules
@@ -51,5 +51,8 @@ CLAUDE.md
 # Commit generation helper script
 make_commits.ps1
 commit_history.txt
+
+# GitHub issues helper script
+create_issues.ps1
 # chore: confirm final ignored paths are valid
 
