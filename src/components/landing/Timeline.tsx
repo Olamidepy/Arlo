@@ -194,4 +194,5 @@ export default function Timeline() {
 }
 // docs: annotate each timeline milestone key
 // style: document color token usage for milestone markers
+// a11y: timeline items use role=listitem for screen readers
 
