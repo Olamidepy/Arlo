@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState, useMemo } from 'react';
 import {
@@ -284,3 +284,5 @@ export default function AgentCanvas() {
     </div>
   );
 }
+// refactor: add clarity comment for canvas node position map
+
