@@ -11,6 +11,7 @@ import AgentGrid from '@/components/landing/AgentGrid';
 import Timeline from '@/components/landing/Timeline';
 import Faq from '@/components/landing/Faq';
 import { useArloStore } from '@/lib/store';
+import ScrollVelocity from '@/components/landing/ScrollVelocity';
 
 // Import AgentCanvas dynamically to disable SSR (as it requires browser APIs for React Flow canvas)
 const AgentCanvas = dynamic(() => import('@/components/landing/AgentCanvas'), { ssr: false });
@@ -125,21 +126,22 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Trusted By Logos */}
-      <section className="py-12 border-y border-[#ECECEC] bg-[#FCFCFC] z-10 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6 opacity-60">
-          <span className="text-xs uppercase font-bold tracking-wider text-[#6B7280] font-display">
+      {/* Trusted By Logos Scroll Velocity Banner */}
+      <section className="py-10 border-y border-[#ECECEC] bg-[#FCFCFC] z-10 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 mb-6 opacity-60 text-center">
+          <span className="text-xs uppercase font-bold tracking-widest text-[#6B7280] font-display">
             Built for Autonomous Agents
           </span>
-          <div className="flex flex-wrap items-center gap-8 sm:gap-12 text-sm font-bold tracking-tight text-[#09090B] font-display">
-            <span>STELLAR</span>
-            <span>SOROBAN</span>
-            <span>STRIPE</span>
-            <span>VERCEL</span>
-            <span>WALLETCONNECT</span>
-            <span>SUPABASE</span>
-          </div>
         </div>
+        <ScrollVelocity
+          texts={[
+            "STELLAR  ✦  SOROBAN  ✦  STRIPE  ✦  VERCEL  ✦  WALLETCONNECT  ✦  SUPABASE",
+            "AUTONOMOUS AGENTS  ✦  ESCROW CONTRACT SETTLEMENTS  ✦  DECENTRALIZED COMPUTE"
+          ]}
+          velocity={50}
+          className="text-2xl md:text-3xl font-extrabold uppercase tracking-wider text-[#09090B] font-display opacity-80"
+          numCopies={3}
+        />
       </section>
 
       {/* Meet the Agents grid */}
