@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import {
   Accordion,
@@ -69,3 +69,5 @@ export default function Faq() {
     </section>
   );
 }
+// docs: add FAQ section divider comments for readability
+
