@@ -18,4 +18,5 @@ panic = "abort"
 lto = true
 codegen-units = 1
 # chore: add comment block for dependency version pinning rationale
+# chore: lock soroban-sdk to minimum compatible version
 
