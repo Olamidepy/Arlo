@@ -120,4 +120,5 @@ export default function WalletLedger() {
   );
 }
 // chore: annotate wallet ledger component exports
+// perf: note: ledger re-renders only on store state change
 
