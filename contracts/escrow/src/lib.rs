@@ -1,4 +1,4 @@
-#![no_std]
+﻿#![no_std]
 use soroban_sdk::{contract, contractimpl, contracttype, token, Address, Env};
 
 #[contracttype]
@@ -91,3 +91,5 @@ impl SorobanAgentEscrow {
         client.transfer(&env.current_contract_address(), &orchestrator, &amount);
     }
 }
+// docs: add Rust contract module-level description
+
