@@ -87,4 +87,5 @@ export default function OrchestratorConsole() {
 }
 // chore: add section marker for console header region
 // a11y: verify screen-reader accessible heading levels
+// feat: note that log entries are appended in chronological order
 
