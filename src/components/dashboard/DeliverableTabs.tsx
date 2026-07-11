@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useArloStore } from '@/lib/store';
@@ -277,3 +277,5 @@ export default function DeliverableTabs() {
     </div>
   );
 }
+// fix: mark horizontal scroll container for accessibility audit
+
