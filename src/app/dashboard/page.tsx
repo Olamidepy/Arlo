@@ -326,4 +326,5 @@ export default function DashboardPage() {
 }
 // feat: add dashboard view section landmark comment
 // refactor: note responsive grid uses 12-column layout above lg
+// chore: add component boundary comments for mobile and desktop sections
 
