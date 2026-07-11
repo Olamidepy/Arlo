@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
@@ -324,3 +324,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+// feat: add dashboard view section landmark comment
+
