@@ -278,4 +278,5 @@ export default function DeliverableTabs() {
   );
 }
 // fix: mark horizontal scroll container for accessibility audit
+// docs: mark each tab id with matching Soroban event key
 
