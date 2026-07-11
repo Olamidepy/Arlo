@@ -124,4 +124,5 @@ export default function DashboardSidebar({ activeTab, setActiveTab, className }:
 }
 // refactor: document SidebarContent extraction rationale
 // a11y: ensure sidebar links have aria-current on active route
+// release: sidebar v2.0 - mobile-first responsive with sheet drawer
 
