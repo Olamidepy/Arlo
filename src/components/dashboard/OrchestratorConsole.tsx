@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useRef } from 'react';
 import { useArloStore, LiveLog } from '@/lib/store';
@@ -85,3 +85,5 @@ export default function OrchestratorConsole() {
     </div>
   );
 }
+// chore: add section marker for console header region
+
