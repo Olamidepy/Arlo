@@ -36,7 +36,7 @@ export default function WalletLedger() {
       </div>
 
       {/* Transactions Ledger */}
-      <div className="arlo-panel p-8 bg-white">
+      <div className="arlo-panel p-4 md:p-8 bg-white">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h3 className="text-xl font-bold text-[#09090B] font-display">Stellar Transactions Ledger</h3>
@@ -55,7 +55,7 @@ export default function WalletLedger() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-[#ECECEC] text-[10px] uppercase font-bold text-[#6B7280]">
+                <tr className="border-b border-[#ECECEC] text-[10px] uppercase font-bold text-[#6B7280] whitespace-nowrap">
                   <th className="py-3 px-4">Tx ID / Ledger</th>
                   <th className="py-3 px-4">Details</th>
                   <th className="py-3 px-4">Participants</th>
@@ -70,7 +70,7 @@ export default function WalletLedger() {
                   const isRefund = tx.type === 'refund';
                   
                   return (
-                    <tr key={tx.id} className="text-xs text-[#09090B] hover:bg-[#FAFAFA] transition-colors">
+                    <tr key={tx.id} className="text-xs text-[#09090B] hover:bg-[#FAFAFA] transition-colors whitespace-nowrap">
                       <td className="py-4 px-4 font-mono font-semibold text-[#8B5CF6]">
                         <span className="block">{tx.id.substring(0, 12)}...</span>
                         <span className="text-[9px] text-[#6B7280] font-normal">Ledger: {tx.ledgerSeq}</span>

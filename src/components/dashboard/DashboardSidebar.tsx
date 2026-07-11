@@ -2,13 +2,12 @@
 
 import Link from 'next/link';
 import { useArloStore } from '@/lib/store';
+import { cn } from '@/lib/utils';
 import { 
   Home, 
   Cpu, 
   FolderGit2, 
   Wallet2, 
-  ReceiptText, 
-  Settings, 
   RotateCcw,
   ArrowLeft
 } from 'lucide-react';
@@ -16,9 +15,18 @@ import {
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  className?: string;
 }
 
-export default function DashboardSidebar({ activeTab, setActiveTab }: SidebarProps) {
+export function SidebarContent({ 
+  activeTab, 
+  setActiveTab,
+  onItemClick
+}: { 
+  activeTab: string; 
+  setActiveTab: (tab: string) => void; 
+  onItemClick?: () => void;
+}) {
   const { resetOrchestration, xlmWalletBalance } = useArloStore();
 
   const menuItems = [
@@ -28,8 +36,18 @@ export default function DashboardSidebar({ activeTab, setActiveTab }: SidebarPro
     { id: 'wallet', label: 'Wallet Ledger', icon: <Wallet2 className="w-4 h-4" /> },
   ];
 
+  const handleItemClick = (tabId: string) => {
+    setActiveTab(tabId);
+    if (onItemClick) onItemClick();
+  };
+
+  const handleReset = () => {
+    resetOrchestration();
+    if (onItemClick) onItemClick();
+  };
+
   return (
-    <aside className="w-64 border-r border-[#ECECEC] bg-white h-screen sticky top-0 flex flex-col justify-between p-6">
+    <div className="flex flex-col justify-between h-full w-full">
       <div className="space-y-8">
         {/* Logo Section */}
         <div className="flex items-center justify-between">
@@ -58,7 +76,7 @@ export default function DashboardSidebar({ activeTab, setActiveTab }: SidebarPro
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => handleItemClick(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                   isActive 
                     ? 'bg-[#F4F4F5] text-[#09090B]' 
@@ -87,12 +105,20 @@ export default function DashboardSidebar({ activeTab, setActiveTab }: SidebarPro
 
         {/* Reset Trigger */}
         <button
-          onClick={resetOrchestration}
+          onClick={handleReset}
           className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full border border-[#ECECEC] text-xs font-medium text-[#6B7280] hover:text-red-600 hover:border-red-200 hover:bg-red-50/50 transition-all cursor-pointer"
         >
           <RotateCcw className="w-3.5 h-3.5" /> Reset Simulator
         </button>
       </div>
+    </div>
+  );
+}
+
+export default function DashboardSidebar({ activeTab, setActiveTab, className }: SidebarProps) {
+  return (
+    <aside className={cn("hidden md:flex w-64 border-r border-[#ECECEC] bg-white h-screen sticky top-0 flex-col justify-between p-6 shrink-0", className)}>
+      <SidebarContent activeTab={activeTab} setActiveTab={setActiveTab} />
     </aside>
   );
 }

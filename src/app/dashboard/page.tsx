@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useArloStore, AgentId } from '@/lib/store';
-import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
+import DashboardSidebar, { SidebarContent } from '@/components/dashboard/DashboardSidebar';
 import OrchestratorConsole from '@/components/dashboard/OrchestratorConsole';
 import DeliverableTabs from '@/components/dashboard/DeliverableTabs';
 import WalletLedger from '@/components/dashboard/WalletLedger';
+import { Sheet, SheetTrigger, SheetPortal, SheetOverlay, SheetContent } from '@/components/ui/sheet';
 import { 
   Play, 
   ArrowRight, 
@@ -20,7 +21,8 @@ import {
   Palette, 
   MessageSquare, 
   Award, 
-  Zap 
+  Zap,
+  Menu
 } from 'lucide-react';
 
 const AgentCanvas = dynamic(() => import('@/components/landing/AgentCanvas'), { ssr: false });
@@ -56,19 +58,51 @@ export default function DashboardPage() {
     launch: <Zap className="w-4 h-4" />
   };
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
-    <div className="relative min-h-screen bg-[#FCFCFC] text-[#09090B] flex font-sans selection:bg-[#8B5CF6]/10 selection:text-[#8B5CF6]">
+    <div className="relative min-h-screen bg-[#FCFCFC] text-[#09090B] flex flex-col md:flex-row font-sans selection:bg-[#8B5CF6]/10 selection:text-[#8B5CF6]">
       {/* Background Soft Gaussian Blurs */}
       <div className="gaussian-gradient-wrapper">
         <div className="blur-blob blob-purple top-[5%] left-[200px]" />
         <div className="blur-blob blob-cyan bottom-[15%] right-[200px]" />
       </div>
 
+      {/* Mobile Header Top Bar */}
+      <header className="md:hidden sticky top-0 z-40 w-full flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur-md border-b border-[#ECECEC]">
+        <div className="flex items-center gap-2">
+          <span className="font-display text-lg font-bold text-[#09090B]">Arlo</span>
+          <span className="text-[9px] font-semibold text-[#8B5CF6] uppercase tracking-wider bg-[#8B5CF6]/8 px-2 py-0.5 rounded-full font-display">
+            Soroban OS
+          </span>
+        </div>
+        
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <SheetTrigger asChild>
+            <button className="p-2.5 rounded-xl border border-[#ECECEC] text-[#09090B] hover:bg-[#FAFAFA] transition-colors">
+              <Menu className="w-5 h-5" />
+            </button>
+          </SheetTrigger>
+          <SheetPortal>
+            <SheetOverlay />
+            <SheetContent side="left" className="w-64 p-0 bg-white h-full border-r border-[#ECECEC]">
+              <div className="p-6 h-full flex flex-col justify-between">
+                <SidebarContent 
+                  activeTab={activeTab} 
+                  setActiveTab={setActiveTab} 
+                  onItemClick={() => setMobileMenuOpen(false)}
+                />
+              </div>
+            </SheetContent>
+          </SheetPortal>
+        </Sheet>
+      </header>
+
       {/* Navigation Sidebar */}
       <DashboardSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Main Content Pane */}
-      <main className="flex-1 p-10 z-10 relative overflow-y-auto h-screen scrollbar-thin">
+      <main className="flex-1 p-4 md:p-10 z-10 relative overflow-y-auto h-screen scrollbar-thin">
         
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
@@ -115,7 +149,7 @@ export default function DashboardPage() {
             {startupIdea && (
               <div className="space-y-8">
                 {/* Active Idea Header Banner */}
-                <div className="arlo-panel p-8 bg-white flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="arlo-panel p-4 md:p-8 bg-white flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="space-y-2">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-[#8B5CF6] font-display bg-[#8B5CF6]/5 px-3 py-1 rounded-full border border-[#8B5CF6]/10">
                       Active Concept
@@ -228,7 +262,7 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <div className="arlo-panel p-8 bg-white">
+            <div className="arlo-panel p-4 md:p-8 bg-white">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>

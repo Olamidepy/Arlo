@@ -32,7 +32,7 @@ export default function DeliverableTabs() {
   const isGenerated = (tabId: typeof activeTab) => !!artifacts[tabId];
 
   return (
-    <div className="arlo-panel p-8 bg-white">
+    <div className="arlo-panel p-4 md:p-8 bg-white">
       <div className="mb-6">
         <h3 className="text-xl font-bold text-[#09090B] font-display">Venture Deliverables</h3>
         <p className="text-xs text-[#6B7280] font-sans">
@@ -41,7 +41,7 @@ export default function DeliverableTabs() {
       </div>
 
       {/* Tabs list */}
-      <div className="flex flex-wrap gap-2 mb-8 border-b border-[#ECECEC] pb-4">
+      <div className="flex gap-2 overflow-x-auto pb-4 mb-8 border-b border-[#ECECEC] scrollbar-thin whitespace-nowrap">
         {tabs.map((tab) => {
           const active = activeTab === tab.id;
           const ready = isGenerated(tab.id);
@@ -49,7 +49,7 @@ export default function DeliverableTabs() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold font-display transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold font-display transition-all shrink-0 ${
                 active 
                   ? 'bg-[#09090B] text-[#FCFCFC] border border-[#09090B]' 
                   : 'bg-[#FCFCFC] text-[#6B7280] border border-[#ECECEC] hover:border-neutral-300'
@@ -68,7 +68,7 @@ export default function DeliverableTabs() {
       {/* Tab content area */}
       <div className="min-h-[260px] flex flex-col justify-start">
         {!isGenerated(activeTab) ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-center p-8 bg-[#FCFCFC] border border-dashed border-[#ECECEC] rounded-2xl">
+          <div className="flex-1 flex flex-col items-center justify-center text-center p-4 md:p-8 bg-[#FCFCFC] border border-dashed border-[#ECECEC] rounded-2xl">
             <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-[#6B7280] mb-4">
               {tabs.find(t => t.id === activeTab)?.icon}
             </div>
@@ -245,7 +245,7 @@ export default function DeliverableTabs() {
 
             {/* LAUNCH CONTENT */}
             {activeTab === 'launch' && artifacts.launch && (
-              <div className="bg-[#FCFCFC] border border-emerald-100 p-8 rounded-3xl flex flex-col sm:flex-row items-center gap-6 justify-between animate-fade-in">
+              <div className="bg-[#FCFCFC] border border-emerald-100 p-4 md:p-8 rounded-3xl flex flex-col sm:flex-row items-center gap-6 justify-between animate-fade-in">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 flex items-center justify-center shrink-0">
                     <Globe className="w-6 h-6" />
