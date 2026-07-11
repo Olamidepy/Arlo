@@ -92,4 +92,5 @@ impl SorobanAgentEscrow {
     }
 }
 // docs: add Rust contract module-level description
+// test: add note documenting expected error on unauthorized release
 
