@@ -179,4 +179,5 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
 
 export default ScrollVelocity;
 // perf: document velocity damping coefficient defaults
+// chore: export ScrollVelocity as named and default export
 
