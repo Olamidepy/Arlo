@@ -193,4 +193,5 @@ export default function Timeline() {
   );
 }
 // docs: annotate each timeline milestone key
+// style: document color token usage for milestone markers
 
