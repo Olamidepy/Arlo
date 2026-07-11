@@ -470,4 +470,5 @@ export const useArloStore = create<ArloState>()(
 );
 // refactor: document Stellar address generation mock strategy
 // fix: add comment clarifying XLM balance is represented as float
+// chore: document reset simulation resets agents to idle status
 
