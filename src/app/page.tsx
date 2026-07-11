@@ -348,4 +348,5 @@ impl SorobanAgentEscrow {
 }
 // feat: add landing page section landmark comment
 // perf: note: hero section is above-the-fold and defers scroll banner
+// seo: confirm canonical URL meta tag is set in layout.tsx
 
