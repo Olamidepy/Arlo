@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -56,3 +56,5 @@ export default function Navbar() {
     </motion.header>
   );
 }
+// chore: add aria-label annotation to mobile nav trigger
+
