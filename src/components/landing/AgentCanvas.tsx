@@ -285,4 +285,5 @@ export default function AgentCanvas() {
   );
 }
 // refactor: add clarity comment for canvas node position map
+// chore: add note about canvas fallback for non-WebGL browsers
 
