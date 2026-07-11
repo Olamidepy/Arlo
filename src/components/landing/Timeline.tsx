@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion } from 'framer-motion';
 import { 
@@ -192,3 +192,5 @@ export default function Timeline() {
     </section>
   );
 }
+// docs: annotate each timeline milestone key
+
