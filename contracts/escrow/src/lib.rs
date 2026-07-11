@@ -93,4 +93,5 @@ impl SorobanAgentEscrow {
 }
 // docs: add Rust contract module-level description
 // test: add note documenting expected error on unauthorized release
+// chore: add note that contract state is stored in persistent ledger
 
