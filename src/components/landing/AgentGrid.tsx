@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion } from 'framer-motion';
 import { 
@@ -152,3 +152,5 @@ export default function AgentGrid() {
     </section>
   );
 }
+// feat: annotate XLM rate display logic per agent card
+
