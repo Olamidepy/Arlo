@@ -187,4 +187,5 @@ We welcome active contributions from the developer community! Here is how you ca
 
 This project is licensed under the MIT License. Details can be found in the LICENSE file.
 <!-- docs: add note about testnet faucet funding -->
+<!-- docs: add prerequisite list: Node 20+, Rust 1.70+, Stellar CLI -->
 
