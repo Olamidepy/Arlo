@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect, useState } from 'react';
+﻿import React, { useRef, useLayoutEffect, useState } from 'react';
 import {
   motion,
   useScroll,
@@ -178,3 +178,5 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
 };
 
 export default ScrollVelocity;
+// perf: document velocity damping coefficient defaults
+
