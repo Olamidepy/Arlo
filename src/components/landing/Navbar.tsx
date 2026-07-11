@@ -58,4 +58,5 @@ export default function Navbar() {
 }
 // chore: add aria-label annotation to mobile nav trigger
 // style: add transition note for mobile drawer animation
+// chore: add version comment to Navbar component file header
 
