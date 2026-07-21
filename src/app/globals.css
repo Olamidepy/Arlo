@@ -1,279 +1,195 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 @import "tw-animate-css";
 @import "tailwindcss";
-
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #FCFCFC;
-  --foreground: #09090B;
-  --card: #FFFFFF;
-  --card-foreground: #09090B;
-  --popover: #FFFFFF;
-  --popover-foreground: #09090B;
-  
-  --primary: #09090B;
-  --primary-foreground: #FCFCFC;
-  
-  --secondary: #F4F4F5;
-  --secondary-foreground: #09090B;
-  
-  --muted: #F4F4F5;
-  --muted-foreground: #6B7280;
-  
-  --accent: #F4F4F5;
-  --accent-foreground: #09090B;
-  
-  --destructive: #EF4444;
-  --destructive-foreground: #FCFCFC;
-  
-  --border: #ECECEC;
-  --input: #ECECEC;
-  --ring: #8B5CF6;
-  
-  --radius: 24px;
+  --background: #0A0A0A;
+  --surface: #111111;
+  --card: #181818;
+  --card-hover: #222222;
+  --accent: #FF6B00;
+  --accent-hover: #FF8533;
+  --text: #FFFFFF;
+  --secondary: #9E9E9E;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-highlight: rgba(255, 107, 0, 0.3);
+
+  --font-heading: var(--font-space-grotesk), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
 }
 
 @theme {
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-display: 'Space Grotesk', sans-serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: var(--font-space-grotesk), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
 
-  --radius-3xl: 24px;
-  --radius-full: 999px;
-
-  --color-border: #ECECEC;
-  --color-input: #ECECEC;
-  --color-ring: #8B5CF6;
-  --color-background: #FCFCFC;
-  --color-foreground: #09090B;
-
-  --color-primary: #09090B;
-  --color-primary-foreground: #FCFCFC;
-  --color-secondary: #F4F4F5;
-  --color-secondary-foreground: #09090B;
-  --color-muted: #F4F4F5;
-  --color-muted-foreground: #6B7280;
-  --color-card: #FFFFFF;
-  --color-card-foreground: #09090B;
-
-  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --color-background: #0A0A0A;
+  --color-surface: #111111;
+  --color-card: #181818;
+  --color-card-hover: #222222;
+  --color-accent: #FF6B00;
+  --color-accent-hover: #FF8533;
+  --color-text: #FFFFFF;
+  --color-secondary: #9E9E9E;
+  --color-border-custom: rgba(255, 255, 255, 0.06);
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   background-color: var(--background);
-  color: var(--foreground);
+  color: var(--text);
   overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-display);
-  font-weight: 600;
+  font-family: var(--font-heading);
   letter-spacing: -0.02em;
 }
 
-/* Gaussian Soft Gradients */
-.gaussian-gradient-wrapper {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
+.font-mono-num {
+  font-family: var(--font-mono);
 }
 
-.blur-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(140px);
-  opacity: 0.08;
-  mix-blend-mode: multiply;
-  pointer-events: none;
-  transition: all 1s ease-in-out;
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0A0A0A;
+}
+::-webkit-scrollbar-thumb {
+  background: #262626;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #FF6B00;
 }
 
-@media (min-width: 768px) {
-  .blur-blob {
-    filter: blur(280px);
-    opacity: 0.12;
-  }
+/* Base Card Style */
+.arlo-card {
+  background-color: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.blob-purple {
-  background-color: #8B5CF6;
-  width: 600px;
-  height: 600px;
-}
-
-.blob-blue {
-  background-color: #5B8CFF;
-  width: 700px;
-  height: 700px;
-}
-
-.blob-cyan {
-  background-color: #65D6FF;
-  width: 500px;
-  height: 500px;
-}
-
-.blob-pink {
-  background-color: #FF5FA2;
-  width: 550px;
-  height: 550px;
-}
-
-.blob-orange {
-  background-color: #FF8A3D;
-  width: 600px;
-  height: 600px;
-}
-
-.blob-yellow {
-  background-color: #FFD166;
-  width: 450px;
-  height: 450px;
-}
-
-/* Sleek UI panels */
-.arlo-panel {
-  background-color: #FFFFFF;
-  border: 1px solid #ECECEC;
-  border-radius: 24px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.arlo-panel-hover:hover {
+.arlo-card:hover {
+  border-color: rgba(255, 107, 0, 0.25);
   transform: translateY(-2px);
-  border-color: #D4D4D8;
-  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.03);
 }
 
-/* Sleek Pill Buttons */
-.btn-arlo {
+/* Button Variants */
+.btn-primary {
+  background-color: #FF6B00;
+  color: #FFFFFF;
+  font-weight: 600;
+  height: 48px;
+  border-radius: 14px;
+  padding: 0 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 48px;
-  padding-left: 24px;
-  padding-right: 24px;
-  border-radius: 999px;
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: 14px;
-  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  white-space: nowrap;
+  gap: 8px;
+  transition: all 0.15s ease;
   user-select: none;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background-color: #FF8533;
+}
+.btn-primary:active {
+  transform: scale(0.98);
 }
 
-.btn-arlo-primary {
-  background-color: #09090B;
-  color: #FCFCFC;
-  border: 1px solid #09090B;
+.btn-secondary {
+  background-color: #181818;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-weight: 500;
+  height: 48px;
+  border-radius: 14px;
+  padding: 0 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  user-select: none;
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  background-color: #222222;
+  border-color: rgba(255, 107, 0, 0.3);
+}
+.btn-secondary:active {
+  transform: scale(0.98);
 }
 
-.btn-arlo-primary:hover {
-  transform: translateY(-2px);
-  background-color: #27272A;
-  border-color: #27272A;
+.btn-outline {
+  background-color: #0A0A0A;
+  color: #FFFFFF;
+  border: 1px solid #FF6B00;
+  font-weight: 600;
+  height: 48px;
+  border-radius: 14px;
+  padding: 0 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  user-select: none;
+  cursor: pointer;
+}
+.btn-outline:hover {
+  background-color: rgba(255, 107, 0, 0.1);
+  border-color: #FF8533;
+}
+.btn-outline:active {
+  transform: scale(0.98);
 }
 
-.btn-arlo-primary:active {
-  transform: translateY(-1px) scale(0.98);
-}
-
-.btn-arlo-secondary {
-  background-color: #FFFFFF;
-  color: #09090B;
-  border: 1px solid #ECECEC;
-}
-
-.btn-arlo-secondary:hover {
-  transform: translateY(-2px);
-  border-color: #D4D4D8;
-  background-color: #FAFAFA;
-}
-
-.btn-arlo-secondary:active {
-  transform: translateY(-1px) scale(0.98);
-}
-
-.btn-arlo-ghost {
+.btn-ghost {
   background-color: transparent;
-  color: #6B7280;
-  border: 1px solid transparent;
+  color: #9E9E9E;
+  font-weight: 500;
+  height: 48px;
+  border-radius: 14px;
+  padding: 0 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  user-select: none;
+  cursor: pointer;
+}
+.btn-ghost:hover {
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.04);
+}
+.btn-ghost:active {
+  transform: scale(0.98);
 }
 
-.btn-arlo-ghost:hover {
-  color: #09090B;
-  background-color: #F4F4F5;
+/* Animations */
+@keyframes wrong-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+.animate-shake {
+  animation: wrong-shake 0.3s ease-in-out;
 }
 
-.btn-arlo-ghost:active {
-  scale: 0.98;
+@keyframes pulse-once {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
 }
-
-/* React Flow customisations to look like a premium tool */
-.react-flow__node {
-  border-radius: 16px !important;
-  border: none !important;
-  background: none !important;
-  padding: 0 !important;
-}
-
-.react-flow__handle {
-  width: 8px !important;
-  height: 8px !important;
-  background-color: #ECECEC !important;
-  border: 2px solid #FFFFFF !important;
-}
-
-.react-flow__handle:hover {
-  background-color: #8B5CF6 !important;
-}
-
-.react-flow__edge-path {
-  stroke: #ECECEC !important;
-  stroke-width: 2 !important;
-}
-
-.react-flow__connection-path {
-  stroke: #8B5CF6 !important;
-  stroke-width: 2 !important;
-}
-
-@theme inline {
-  --font-heading: var(--font-display);
-  --font-sans: var(--font-sans);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --radius-sm: calc(var(--radius) * 0.4);
-  --radius-md: calc(var(--radius) * 0.6);
-  --radius-lg: calc(var(--radius) * 0.8);
-  --radius-xl: var(--radius);
-  --radius-2xl: calc(var(--radius) * 1.4);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+.animate-pulse-once {
+  animation: pulse-once 0.35s ease-out;
 }
