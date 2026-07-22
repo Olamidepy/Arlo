@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { AIDifficulty } from "../game-engine/ai-bot";
 import { WalletState, GUEST_INITIAL_STATE } from "../wallet/stacks";
 import { sound } from "../audio/sound";
+import { createPRNG, shuffleArray } from "../game-engine/prng";
 
 export type ScreenType =
   | "LANDING"
@@ -25,7 +26,7 @@ export type GameMode =
   | "lightning"
   | "kids";
 
-export type GameStatus = "IDLE" | "LOBBY" | "COUNTDOWN" | "PLAYING" | "PAUSED" | "GAME_OVER";
+export type GameStatus = "IDLE" | "LOBBY" | "COUNTDOWN" | "PLAYING" | "PAUSED" | "ROUND_ENDED" | "GAME_OVER";
 
 export interface TapRecord {
   target: number;
@@ -67,7 +68,8 @@ export interface GameStoreState {
   playerRoundWins: number;
   opponentRoundWins: number;
   roundScores: RoundResult[];
-  roundTimeLeft: number; // 60 seconds countdown per round
+  roundTimeLeft: number; // 60 seconds per round
+  lastRoundWinner: { round: number; winner: "player" | "opponent"; playerScore: number; opponentScore: number } | null;
 
   // Single Round Engine State
   status: GameStatus;
@@ -76,6 +78,7 @@ export interface GameStoreState {
   currentTargetNumber: number;
   targetSequence: number[];
   currentStepIndex: number;
+  completedNumbers: number[];
   playerScore: number;
   opponentScore: number;
   wrongTaps: number;
@@ -116,6 +119,7 @@ export interface GameStoreState {
   handleTapNumber: (num: number) => boolean;
   handleOpponentProgress: (score: number) => void;
   endRound: () => void;
+  proceedToNextRound: () => void;
   pauseGame: () => void;
   resumeGame: () => void;
 
@@ -152,13 +156,15 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   opponentRoundWins: 0,
   roundScores: [],
   roundTimeLeft: 60,
+  lastRoundWinner: null,
 
   status: "IDLE",
   seed: "ARLO-SEED-88",
   maxNumber: 100,
   currentTargetNumber: 1,
-  targetSequence: Array.from({ length: 100 }, (_, i) => i + 1),
+  targetSequence: [],
   currentStepIndex: 0,
+  completedNumbers: [],
   playerScore: 0,
   opponentScore: 0,
   wrongTaps: 0,
@@ -218,9 +224,15 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     if (activeMode === "lightning") max = 30;
     if (activeMode === "kids") max = 20;
 
-    let seq = Array.from({ length: max }, (_, i) => i + 1);
+    const baseSeq = Array.from({ length: max }, (_, i) => i + 1);
+    const rng = createPRNG(newSeed);
+
+    let seq: number[] = [];
     if (activeMode === "reverse") {
       seq = Array.from({ length: max }, (_, i) => max - i);
+    } else {
+      // Shuffle target prompts so player must search randomly across palm
+      seq = shuffleArray(baseSeq, rng);
     }
 
     set({
@@ -230,6 +242,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       currentTargetNumber: seq[0],
       targetSequence: seq,
       currentStepIndex: 0,
+      completedNumbers: [],
       playerScore: 0,
       opponentScore: 0,
       wrongTaps: 0,
@@ -246,6 +259,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       opponentRoundWins: 0,
       roundScores: [],
       roundTimeLeft: 60,
+      lastRoundWinner: null,
 
       status: activeMode === "online" || activeMode === "tournament" ? "LOBBY" : "COUNTDOWN",
     });
@@ -265,7 +279,6 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     if (state.status !== "PLAYING") return;
 
     if (state.roundTimeLeft <= 1) {
-      // 60-Second Round Time Expired!
       state.endRound();
     } else {
       set({ roundTimeLeft: state.roundTimeLeft - 1 });
@@ -288,14 +301,15 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
       const reactionTime = Math.max(80, now - lastTapTime);
       const updatedTapHistory = [...state.tapHistory, { target: num, ms: reactionTime }];
+      const updatedCompleted = [...state.completedNumbers, num];
       const nextIndex = state.currentStepIndex + 1;
       const newScore = state.playerScore + 1;
 
       if (nextIndex >= state.targetSequence.length) {
-        // All target numbers found for this round!
         set({
           playerScore: newScore,
           currentStepIndex: nextIndex,
+          completedNumbers: updatedCompleted,
           tapHistory: updatedTapHistory,
           elapsedMs: now - state.startTime,
         });
@@ -307,13 +321,13 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
           playerScore: newScore,
           currentStepIndex: nextIndex,
           currentTargetNumber: nextTarget,
+          completedNumbers: updatedCompleted,
           tapHistory: updatedTapHistory,
           elapsedMs: now - state.startTime,
         });
         return true;
       }
     } else {
-      // Wrong Tap!
       sound.playWrongTap();
       const updatedWrongTaps = state.wrongTaps + 1;
       let newHp = state.playerHp;
@@ -346,15 +360,13 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
   endRound: () => {
     const state = get();
-    if (state.status === "GAME_OVER") return;
+    if (state.status === "GAME_OVER" || state.status === "ROUND_ENDED") return;
 
-    // Determine round winner: Player wins if playerScore > opponentScore, or if equal, fewer wrong taps
     const isPlayerRoundWin =
       state.playerScore > state.opponentScore ||
       (state.playerScore === state.opponentScore && state.wrongTaps <= 0);
 
     const roundWinner: "player" | "opponent" = isPlayerRoundWin ? "player" : "opponent";
-
     const newPlayerWins = isPlayerRoundWin ? state.playerRoundWins + 1 : state.playerRoundWins;
     const newOpponentWins = !isPlayerRoundWin ? state.opponentRoundWins + 1 : state.opponentRoundWins;
 
@@ -368,27 +380,41 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       },
     ];
 
-    // Check overall match winner (Best of 3: first to 2 wins, or after 3 rounds)
+    if (isPlayerRoundWin) {
+      sound.playVictoryFanfare();
+    } else {
+      sound.playDefeatSound();
+    }
+
+    set({
+      playerRoundWins: newPlayerWins,
+      opponentRoundWins: newOpponentWins,
+      roundScores: updatedRoundScores,
+      lastRoundWinner: {
+        round: state.currentRound,
+        winner: roundWinner,
+        playerScore: state.playerScore,
+        opponentScore: state.opponentScore,
+      },
+      status: "ROUND_ENDED",
+    });
+  },
+
+  proceedToNextRound: () => {
+    const state = get();
     const matchFinished =
-      newPlayerWins >= 2 || newOpponentWins >= 2 || state.currentRound >= state.maxRounds;
+      state.playerRoundWins >= 2 ||
+      state.opponentRoundWins >= 2 ||
+      state.currentRound >= state.maxRounds;
 
     if (matchFinished) {
       const overallWinner: "player" | "opponent" =
-        newPlayerWins > newOpponentWins ? "player" : "opponent";
+        state.playerRoundWins > state.opponentRoundWins ? "player" : "opponent";
 
       const totalElapsed = Date.now() - state.startTime;
-      const stxAward = overallWinner === "player" ? 0.001 : 0; // 0.001 STX reward on victory!
-
-      if (overallWinner === "player") {
-        sound.playVictoryFanfare();
-      } else {
-        sound.playDefeatSound();
-      }
+      const stxAward = overallWinner === "player" ? 0.001 : 0; // 0.001 STX reward!
 
       set({
-        playerRoundWins: newPlayerWins,
-        opponentRoundWins: newOpponentWins,
-        roundScores: updatedRoundScores,
         winner: overallWinner,
         stxEarned: stxAward,
         status: "GAME_OVER",
@@ -411,29 +437,31 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         },
       });
     } else {
-      // Advance to Next Round (Round 2 or Round 3)
+      // Advance to Next Round (Round 2 or 3)
       const nextRound = state.currentRound + 1;
       const newRoundSeed = `ARLO-R${nextRound}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
 
-      let seq = Array.from({ length: state.maxNumber }, (_, i) => i + 1);
+      const baseSeq = Array.from({ length: state.maxNumber }, (_, i) => i + 1);
+      const rng = createPRNG(newRoundSeed);
+      let seq = shuffleArray(baseSeq, rng);
+
       if (state.gameMode === "reverse") {
         seq = Array.from({ length: state.maxNumber }, (_, i) => state.maxNumber - i);
       }
 
       set({
         currentRound: nextRound,
-        playerRoundWins: newPlayerWins,
-        opponentRoundWins: newOpponentWins,
-        roundScores: updatedRoundScores,
         seed: newRoundSeed,
         currentTargetNumber: seq[0],
         targetSequence: seq,
         currentStepIndex: 0,
+        completedNumbers: [],
         playerScore: 0,
         opponentScore: 0,
         wrongTaps: 0,
         playerHp: 3,
         roundTimeLeft: 60,
+        lastRoundWinner: null,
         status: "COUNTDOWN",
       });
     }

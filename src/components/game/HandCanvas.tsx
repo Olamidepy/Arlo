@@ -2,13 +2,13 @@
 
 import React, { useMemo, useState } from "react";
 import { generateHandLayout, PlacedNumber } from "../../lib/game-engine/placement";
-import { useGameStore } from "../../lib/store/gameStore";
 
 interface HandCanvasProps {
   seed: string;
   maxNumber: number;
   currentTargetNumber: number;
   onTapNumber: (num: number) => void;
+  completedNumbers?: Set<number>;
   isMemoryHidden?: boolean;
   isKidsMode?: boolean;
 }
@@ -18,11 +18,12 @@ export const HandCanvas: React.FC<HandCanvasProps> = ({
   maxNumber,
   currentTargetNumber,
   onTapNumber,
+  completedNumbers = new Set(),
   isMemoryHidden = false,
   isKidsMode = false,
 }) => {
   const [shakingId, setShakingId] = useState<number | null>(null);
-  const [pulsingId, setPulsingId] = useState<number | null>(null);
+  const [justTappedId, setJustTappedId] = useState<number | null>(null);
 
   // Generate procedural layout deterministically from seed
   const layout = useMemo(() => {
@@ -30,9 +31,11 @@ export const HandCanvas: React.FC<HandCanvasProps> = ({
   }, [seed, maxNumber]);
 
   const handleTap = (num: PlacedNumber) => {
+    if (completedNumbers.has(num.value)) return;
+
     if (num.value === currentTargetNumber) {
-      setPulsingId(num.value);
-      setTimeout(() => setPulsingId(null), 300);
+      setJustTappedId(num.value);
+      setTimeout(() => setJustTappedId(null), 250);
       onTapNumber(num.value);
     } else {
       setShakingId(num.value);
@@ -41,19 +44,16 @@ export const HandCanvas: React.FC<HandCanvasProps> = ({
     }
   };
 
-  // Color palette for Kids Mode or default sleek mono/orange style
   const getNumberColor = (num: PlacedNumber) => {
-    if (num.value < currentTargetNumber) {
-      // Completed numbers
-      return "#2A2A2A";
-    }
-    if (num.value === currentTargetNumber) {
-      return "#FF6B00"; // Accent target highlight
+    if (completedNumbers.has(num.value) || num.value < currentTargetNumber) {
+      // Completed / Found numbers are dimmed out
+      return "#262626";
     }
     if (isKidsMode) {
       const colors = ["#FF5722", "#4CAF50", "#2196F3", "#9C27B0", "#FFEB3B", "#FF9800"];
       return colors[num.value % colors.length];
     }
+    // IMPORTANT: ALL un-tapped numbers look identical (#E5E5E5) so the target is NOT revealed!
     return "#E5E5E5";
   };
 
@@ -69,7 +69,7 @@ export const HandCanvas: React.FC<HandCanvasProps> = ({
             <stop offset="100%" stopColor="#0B0B0B" />
           </linearGradient>
           <filter id="handGlow" x="-10%" y="-10%" width="120%" height="120%">
-            <feDropShadow dx="0" dy="8" stdDeviation="16" floodColor="#FF6B00" floodOpacity="0.08" />
+            <feDropShadow dx="0" dy="8" stdDeviation="16" floodColor="#FF6B00" floodOpacity="0.05" />
           </filter>
         </defs>
 
@@ -106,7 +106,7 @@ export const HandCanvas: React.FC<HandCanvasProps> = ({
           filter="url(#handGlow)"
         />
 
-        {/* Anatomical Palm & Joint Detail Lines */}
+        {/* Detail Lines */}
         <path
           d="M 330 530 C 420 580 540 560 660 500"
           fill="none"
@@ -122,14 +122,13 @@ export const HandCanvas: React.FC<HandCanvasProps> = ({
           strokeDasharray="6 6"
         />
 
-        {/* Render Interactive Seeded Numbers */}
+        {/* Render Numbers Without Target Hint Rings */}
         {layout.map((item) => {
-          const isTarget = item.value === currentTargetNumber;
-          const isDone = item.value < currentTargetNumber;
+          const isDone = completedNumbers.has(item.value);
           const isShaking = shakingId === item.value;
-          const isPulsing = pulsingId === item.value || isTarget;
+          const isJustTapped = justTappedId === item.value;
 
-          if (isMemoryHidden && !isDone && !isTarget) {
+          if (isMemoryHidden && !isDone) {
             return null; // Hide in Memory Mode after 5s
           }
 
@@ -140,39 +139,28 @@ export const HandCanvas: React.FC<HandCanvasProps> = ({
               onClick={() => handleTap(item)}
               className="cursor-pointer transition-transform duration-100 ease-out active:scale-95 group"
             >
-              {/* Background Hit Target Area */}
+              {/* Hit Area */}
               <circle
                 r={item.fontSize * 1.3}
-                fill={isTarget ? "rgba(FF, 107, 0, 0.2)" : "transparent"}
-                className={`${isTarget ? "animate-ping opacity-30" : ""} group-hover:fill-white/5 transition-colors`}
+                fill="transparent"
+                className="group-hover:fill-white/5 transition-colors"
               />
 
-              {/* Target Highlight Ring */}
-              {isTarget && (
-                <circle
-                  r={item.fontSize * 1.2}
-                  fill="none"
-                  stroke="#FF6B00"
-                  strokeWidth="3"
-                  className="animate-pulse"
-                />
-              )}
-
-              {/* Number Text */}
+              {/* Number Text - NO HINT RINGS / NO SPECIAL HIGHLIGHT COLOR */}
               <text
                 x="0"
                 y="0"
                 textAnchor="middle"
                 dominantBaseline="central"
-                fill={getNumberColor(item)}
+                fill={isDone ? "#262626" : isJustTapped ? "#FF6B00" : getNumberColor(item)}
                 fontSize={item.fontSize}
-                fontWeight={isTarget ? "700" : isDone ? "400" : "600"}
+                fontWeight={isDone ? "400" : "600"}
                 fontFamily="var(--font-jetbrains-mono), monospace"
                 className={`
                   pointer-events-none select-none transition-all duration-150
                   ${isShaking ? "fill-red-500 animate-shake" : ""}
-                  ${isPulsing ? "scale-125" : ""}
-                  ${isDone ? "opacity-30 stroke-neutral-700" : "opacity-95"}
+                  ${isJustTapped ? "scale-125 font-bold" : ""}
+                  ${isDone ? "opacity-30" : "opacity-95"}
                 `}
               >
                 {item.value}

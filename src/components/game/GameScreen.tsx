@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useGameStore } from "../../lib/store/gameStore";
 import { HandCanvas } from "./HandCanvas";
 import { TargetBanner } from "./TargetBanner";
 import { CountdownOverlay } from "./CountdownOverlay";
 import { getAIReactionDelay, checkAIMistake } from "../../lib/game-engine/ai-bot";
-import { Play, RefreshCw, Home, EyeOff } from "lucide-react";
+import { Play, RefreshCw, Home, EyeOff, Trophy, ArrowRight } from "lucide-react";
 
 export const GameScreen: React.FC = () => {
   const {
@@ -14,15 +14,21 @@ export const GameScreen: React.FC = () => {
     seed,
     maxNumber,
     currentTargetNumber,
+    completedNumbers,
     gameMode,
     aiDifficulty,
     opponentScore,
+    currentRound,
+    lastRoundWinner,
     handleTapNumber,
     handleOpponentProgress,
+    proceedToNextRound,
     resumeGame,
     initGame,
     setActiveScreen,
   } = useGameStore();
+
+  const completedSet = useMemo(() => new Set(completedNumbers), [completedNumbers]);
 
   // Memory Mode countdown
   const [memoryHidden, setMemoryHidden] = useState(false);
@@ -94,10 +100,41 @@ export const GameScreen: React.FC = () => {
           maxNumber={maxNumber}
           currentTargetNumber={currentTargetNumber}
           onTapNumber={handleTapNumber}
+          completedNumbers={completedSet}
           isMemoryHidden={memoryHidden && gameMode === "memory"}
           isKidsMode={gameMode === "kids"}
         />
       </div>
+
+      {/* Round End Modal (Round 1 / Round 2 / Round 3 Winner Display) */}
+      {status === "ROUND_ENDED" && lastRoundWinner && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full max-w-sm bg-[#111111] border border-white/10 p-6 sm:p-8 rounded-2xl flex flex-col gap-5 text-center shadow-2xl">
+            <div className="w-14 h-14 rounded-full bg-[#FF6B00]/15 border border-[#FF6B00] text-[#FF6B00] flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(255,107,0,0.4)]">
+              <Trophy className="w-7 h-7" />
+            </div>
+
+            <div>
+              <span className="text-xs font-mono font-semibold uppercase tracking-widest text-[#9E9E9E]">
+                ROUND {lastRoundWinner.round} COMPLETED
+              </span>
+              <h3 className="text-3xl font-extrabold font-heading text-white mt-1">
+                {lastRoundWinner.winner === "player" ? "ROUND WINNER: YOU!" : "ROUND WINNER: OPPONENT"}
+              </h3>
+              <p className="text-xs text-[#9E9E9E] mt-1 font-mono">
+                Round Score: YOU ({lastRoundWinner.playerScore}) vs OPPONENT ({lastRoundWinner.opponentScore})
+              </p>
+            </div>
+
+            <button
+              onClick={proceedToNextRound}
+              className="btn-primary w-full text-sm font-bold shadow-[0_0_20px_rgba(255,107,0,0.3)] mt-2"
+            >
+              Continue to Round {currentRound < 3 ? currentRound + 1 : "Final Results"} <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Pause Menu Modal Overlay */}
       {status === "PAUSED" && (
