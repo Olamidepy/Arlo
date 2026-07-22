@@ -287,11 +287,16 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
   handleTapNumber: (num) => {
     const state = get();
-    if (state.status !== "PLAYING") return false;
+    if (state.status === "COUNTDOWN") {
+      set({ status: "PLAYING", startTime: Date.now() });
+    } else if (state.status !== "PLAYING") {
+      return false;
+    }
 
-    const expected = state.currentTargetNumber;
+    const currentState = get();
+    const expected = currentState.currentTargetNumber;
 
-    if (num === expected) {
+    if (Number(num) === Number(expected)) {
       sound.playCorrectTap();
       const now = Date.now();
       const lastTapTime =

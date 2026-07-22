@@ -31,29 +31,31 @@ export const HandCanvas: React.FC<HandCanvasProps> = ({
   }, [seed, maxNumber]);
 
   const handleTap = (num: PlacedNumber) => {
-    if (completedNumbers.has(num.value)) return;
+    const val = Number(num.value);
+    const target = Number(currentTargetNumber);
 
-    if (num.value === currentTargetNumber) {
-      setJustTappedId(num.value);
-      setTimeout(() => setJustTappedId(null), 250);
-      onTapNumber(num.value);
+    if (completedNumbers.has(val)) return;
+
+    if (val === target) {
+      setJustTappedId(val);
+      setTimeout(() => setJustTappedId(null), 300);
+      onTapNumber(val);
     } else {
-      setShakingId(num.value);
+      setShakingId(val);
       setTimeout(() => setShakingId(null), 350);
-      onTapNumber(num.value);
+      onTapNumber(val);
     }
   };
 
   const getNumberColor = (num: PlacedNumber) => {
-    if (completedNumbers.has(num.value) || num.value < currentTargetNumber) {
-      // Completed / Found numbers are dimmed out
+    const val = Number(num.value);
+    if (completedNumbers.has(val)) {
       return "#262626";
     }
     if (isKidsMode) {
       const colors = ["#FF5722", "#4CAF50", "#2196F3", "#9C27B0", "#FFEB3B", "#FF9800"];
-      return colors[num.value % colors.length];
+      return colors[val % colors.length];
     }
-    // IMPORTANT: ALL un-tapped numbers look identical (#E5E5E5) so the target is NOT revealed!
     return "#E5E5E5";
   };
 
@@ -122,31 +124,45 @@ export const HandCanvas: React.FC<HandCanvasProps> = ({
           strokeDasharray="6 6"
         />
 
-        {/* Render Numbers Without Target Hint Rings */}
+        {/* Render Numbers */}
         {layout.map((item) => {
-          const isDone = completedNumbers.has(item.value);
-          const isShaking = shakingId === item.value;
-          const isJustTapped = justTappedId === item.value;
+          const val = Number(item.value);
+          const isDone = completedNumbers.has(val);
+          const isShaking = shakingId === val;
+          const isJustTapped = justTappedId === val;
 
           if (isMemoryHidden && !isDone) {
-            return null; // Hide in Memory Mode after 5s
+            return null;
           }
+
+          // Enforce 68px minimum touch hit area for single and double digit numbers
+          const hitRadius = Math.max(item.fontSize * 1.8, 34);
 
           return (
             <g
               key={item.id}
               transform={`translate(${item.x}, ${item.y}) rotate(${item.rotation})`}
-              onClick={() => handleTap(item)}
-              className="cursor-pointer transition-transform duration-100 ease-out active:scale-95 group"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleTap(item);
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleTap(item);
+              }}
+              style={{ pointerEvents: "all" }}
+              className="cursor-pointer transition-transform duration-100 ease-out active:scale-90 group"
             >
-              {/* Hit Area */}
+              {/* Solid SVG Hit Target Circle (rgba fill ensures 100% hittable DOM region in all browsers) */}
               <circle
-                r={item.fontSize * 1.3}
-                fill="transparent"
-                className="group-hover:fill-white/5 transition-colors"
+                r={hitRadius}
+                fill="rgba(255, 255, 255, 0.001)"
+                style={{ pointerEvents: "all" }}
+                className="group-hover:fill-white/10 transition-colors"
               />
 
-              {/* Number Text - NO HINT RINGS / NO SPECIAL HIGHLIGHT COLOR */}
+              {/* Number Text */}
               <text
                 x="0"
                 y="0"
@@ -154,13 +170,14 @@ export const HandCanvas: React.FC<HandCanvasProps> = ({
                 dominantBaseline="central"
                 fill={isDone ? "#262626" : isJustTapped ? "#FF6B00" : getNumberColor(item)}
                 fontSize={item.fontSize}
-                fontWeight={isDone ? "400" : "600"}
+                fontWeight={isDone ? "400" : "700"}
                 fontFamily="var(--font-jetbrains-mono), monospace"
+                style={{ pointerEvents: "none" }}
                 className={`
                   pointer-events-none select-none transition-all duration-150
                   ${isShaking ? "fill-red-500 animate-shake" : ""}
-                  ${isJustTapped ? "scale-125 font-bold" : ""}
-                  ${isDone ? "opacity-30" : "opacity-95"}
+                  ${isJustTapped ? "scale-125 fill-[#FF6B00]" : ""}
+                  ${isDone ? "opacity-25" : "opacity-95"}
                 `}
               >
                 {item.value}
