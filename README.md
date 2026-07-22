@@ -1,192 +1,156 @@
-﻿# Arlo: AI Venture Orchestrator on Stellar Soroban
+# Arlo — Find. Tap. Repeat.
 
-Arlo is a modern, enterprise-grade AI Venture Orchestrator built on the **Stellar Network** and powered by **Soroban Smart Contracts**.
+> **The fastest eyes win.**
 
-Arlo transforms single startup ideas into complete launch-ready businesses by autonomously coordinating multiple specialized AI agents. Instead of relying on a single large LLM context window, Arlo acts as the primary orchestrator that deploys, funds, and settles payments with independent AI specialists through secure, decentralized Soroban smart contract escrows using native **XLM** tokens.
-
----
-
-## 1. Problem Statement
-
-Monolithic LLM agents face severe context limits, reasoning degradation, and lack the specialization needed for true production-grade software and business output. Single-agent chatbots are locked to a single perspective, while custom multi-agent frameworks are usually hardcoded, non-scalable, and cannot handle autonomous agent-to-agent commerce or secure resource trading.
-
-## 2. Solution: Autonomous Agent Commerce & Escrows
-
-Arlo resolves this by decoupling the startup launch pipeline into a network of independent AI agent nodes that:
-1. **Trade Compute & Deliverables**: Each agent publishes its capability schema and cost rate in native **XLM**.
-2. **Deposit Escrow Releases**: The orchestrator secures payments inside decentralized Soroban smart contract escrows. Deposit funds are released to agent wallets only after the deliverables pass automated verification.
-3. **Collaborate Peer-to-Peer**: The output of one agent is serialized and piped directly to the input handle of the next node.
+Arlo is a minimal, competitive multiplayer visual reaction game where players race to locate and tap numbers (1–100) scattered across a procedurally generated hand illustration. Built with a clean, dark design system, micro-animations, and seamless Stacks Leather wallet integration for Web3 skill-based STX rewards.
 
 ---
 
-## 3. Architecture Flow
+## 🎮 Concept
 
-```mermaid
-graph TD
-    User[User Idea Input] -->|Submit| Arlo[Arlo Orchestrator]
-    Arlo -->|Deploy Escrow & Deposit 45 XLM| Scout[Scout: Market Research]
-    Scout -->|Handoff Viability Data| Atlas[Atlas: Business Strategy]
-    Arlo -->|Deploy Escrow & Deposit 60 XLM| Atlas
-    Atlas -->|Handoff Business Model| Muse[Muse: Brand Naming]
-    Arlo -->|Deploy Escrow & Deposit 25 XLM| Muse
-    Muse -->|Handoff Brand Name| Canvas[Canvas: Brand Identity]
-    Arlo -->|Deploy Escrow & Deposit 80 XLM| Canvas
-    Canvas -->|Handoff Visual Assets| Echo[Echo: Marketing Copy]
-    Arlo -->|Deploy Escrow & Deposit 40 XLM| Echo
-    Echo -->|Handoff Headlines & Copy| Spark[Spark: Pitch Deck]
-    Arlo -->|Deploy Escrow & Deposit 90 XLM| Spark
-    Spark -->|Handoff Seed Pitch Slides| Launch[Launch: Deployment]
-    Arlo -->|Deploy Escrow & Deposit 110 XLM| Launch
-    Launch -->|DNS & SSL Certified live URL| Success[Launch Ready Startup]
-    
-    classDef purple fill:#8B5CF6,stroke:#FFFFFF,stroke-width:2px,color:#FFF;
-    classDef blue fill:#5B8CFF,stroke:#FFFFFF,stroke-width:2px,color:#FFF;
-    classDef orange fill:#FF8A3D,stroke:#FFFFFF,stroke-width:2px,color:#FFF;
-    classDef green fill:#10B981,stroke:#FFFFFF,stroke-width:2px,color:#FFF;
-    
-    class Arlo purple;
-    class Scout,Atlas,Muse blue;
-    class Canvas,Echo,Spark orange;
-    class Launch,Success green;
+Numbers 1–100 are randomly distributed across the palm and fingers of a vector hand silhouette. The first player to correctly tap the current target number advances to the next.
+
+```
+Game Starts ➔ Find: 1 ➔ Player taps 1 ➔ Next: 2 ➔ Player taps 2 ... ➔ 100 ➔ Fastest wins!
 ```
 
 ---
 
-## 4. Hired Agents & Rates
+## ⚡ Key Features & Game Modes
 
-| Agent Name | Role | Native XLM Rate | Deliverable Output | Escrow Contract ID |
-| :--- | :--- | :--- | :--- | :--- |
-| **Scout** | Market Research | 45.0 XLM | TAM metrics, target demographics, viability indexes | `CC7R2X...1V` |
-| **Atlas** | Business Strategy | 60.0 XLM | Lean business canvas, monetization loops, cost ratios | `CC3W7U...5Q` |
-| **Muse** | Brand Naming | 25.0 XLM | Semantic name proposals, domain extension availability | `CCMUSE...5Q` |
-| **Canvas** | Brand Identity | 80.0 XLM | Geometric vector logo assets, Tailwind palettes | `CCCANV...5Q` |
-| **Echo** | Marketing Copy | 40.0 XLM | Value-prop grids, hero copywriting block components | `CCECHO...V1` |
-| **Spark** | Pitch Deck | 90.0 XLM | VC presentation slides, problem/solution sheets | `CCSPAR...A6` |
-| **Launch** | Deployment | 110.0 XLM | SSL security provisioning, custom domain mapping, live URL | `CCLAUN...J5` |
+### 1. Solo & Practice
+- **Quick Play 1–100**: Race against your personal best time on fresh, procedurally generated hand layouts.
+- **Daily Challenge**: Everyone plays on the exact same daily seed layout. The fastest times climb the global leaderboard.
+
+### 2. AI 1v1 Modes
+Play against simulated AI opponents with realistic human reaction times and cognitive scanning delays:
+- **Easy (Rookie Bot)**: 850–1650ms delay, 12% mistake probability.
+- **Medium (Pro Bot)**: 450–850ms delay, 5% mistake probability.
+- **Hard (Master Bot)**: 240–480ms delay, 1% mistake probability.
+- **Impossible (CYBORG X)**: 110–220ms delay, 0% mistake probability (godlike speed).
+
+### 3. Online 1v1 & Tournaments
+- **Create / Join Rooms**: Host custom rooms with a 4-digit room code.
+- **Real-Time Progress**: Live opponent score progress bar and activity updates.
+- **STX Skill Wagers**: Stake STX (e.g. 0.1 STX entry, 0.18 STX payout to winner, 0.02 STX platform fee).
+- **Tournament Brackets**: Visual bracket system supporting 8, 16, and 32 player knockout competitions.
+
+### 4. Specialized Variant Modes
+- **Survival**: Wrong tap = lose 1 HP. 3 mistakes = Game Over.
+- **Reverse Mode**: Find 100 ➔ 99 ➔ 98 ... ➔ 1.
+- **Memory Mode**: Numbers fade away after 5 seconds. Player must remember locations!
+- **Lightning (1–30)**: Ultra-fast speedrun for quick matches.
+- **Kids Mode (1–20)**: Extra-large numbers with bright colors.
 
 ---
 
-## 5. Technology Stack
+## 🧠 Procedural Vector Hand Engine
 
-* **Smart Contracts**: Soroban Smart Contracts framework (Rust, `soroban-sdk` v20.0.0)
-* **Local Development & CLI**: `stellar-cli` for testing, building, and deploying contract WASM bytecodes
-* **Stellar Interaction**: Horizon Client and Soroban RPC API integration endpoints
-* **Frontend Framework**: Next.js 15 (App Router, React 19 Canary)
-* **Styling**: Tailwind CSS v4 variables, soft Gaussian mesh gradients
-* **Workflow Visuals**: React Flow v12 (`@xyflow/react`)
-* **State Manager**: Zustand (persistent simulation cache)
-* **Animations**: Framer Motion transitions
+Match layouts are never fixed or hardcoded. Instead, every game generates a unique, fair layout using a seeded pseudo-random engine:
+
+1. **Seeded PRNG**: Uses Mulberry32 PRNG to deterministically generate spatial coordinates from a seed string (`ARLO-XXXX`), guaranteeing identical, fair layouts for all players in multiplayer matches.
+2. **7 Anatomical Zones**: Hand canvas is partitioned into Palm Center, Palm Base, Thumb, Index, Middle, Ring, and Pinky fingers.
+3. **Collision Avoidance**: Spatial grid rejection sampling ensures every single number is non-overlapping, crisp, and tappable.
+4. **Natural Aesthetic**: Applies subtle deterministic rotations (`-18°` to `+18°`) and scale variance for a printed look.
 
 ---
 
-## 6. Directory Structure
+## 🎨 Design Direction
+
+Inspired by the clean simplicity of Duolingo, Clash Royale polish, and Apple typography spacing:
+
+- **Background**: `#0A0A0A`
+- **Surface**: `#111111`
+- **Cards**: `#181818`
+- **Accent Color**: `#FF6B00` (Orange)
+- **Hover Accent**: `#FF8533`
+- **Typography**:
+  - **Headings**: `Space Grotesk`
+  - **Body**: `Inter`
+  - **Numbers**: `JetBrains Mono`
+
+---
+
+## 🌐 Stacks Web3 & Leather Wallet Integration
+
+- **Wallet Connection**: Supports Leather wallet connection via `@stacks/connect` or browser extension detection.
+- **Guest Mode**: Allows anyone to jump directly into gameplay without requiring a wallet.
+- **Leaderboards & Profiles**: Global rankings, daily/weekly stats, reaction speed metrics (ms/tap), and unlockable NFT badges.
+
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend**: Next.js 15, TypeScript, React 19
+- **Styling**: Tailwind CSS v4, Vanilla CSS Design Tokens
+- **State Management**: Zustand
+- **Graphics**: Interactive SVG Vector Engine
+- **Blockchain**: Stacks Blockchain (Leather Wallet API)
+
+---
+
+## 📂 Directory Structure
 
 ```
 arlo/
-├── contracts/
-│   └── escrow/                 # Soroban Escrow Smart Contract
-│       ├── src/
-│       │   └── lib.rs          # Escrow logic: initialize, release, refund in Rust
-│       └── Cargo.toml          # Rust dependencies and WASM build profiles
 ├── src/
 │   ├── app/
-│   │   ├── globals.css         # Tailwind CSS v4 themes, blurs, and button layouts
-│   │   ├── layout.tsx          # Space Grotesk & Inter font layout
-│   │   ├── page.tsx            # Landing page with visual AgentCanvas
-│   │   └── dashboard/
-│   │       └── page.tsx        # Enterprise venture cockpit and live terminal logs
+│   │   ├── globals.css         # Tailwind v4 dark theme, fonts, button classes
+│   │   ├── layout.tsx          # Space Grotesk, Inter, JetBrains Mono Google Fonts
+│   │   └── page.tsx            # App View Router (Landing, Home, Lobby, Game, Results, Leaderboard, Wallet, Profile)
 │   ├── components/
-│   │   ├── landing/
-│   │   │   ├── Navbar.tsx      # Sticky glass navigation header
-│   │   │   ├── AgentCanvas.tsx # Hero visual: animated React Flow chain
-│   │   │   ├── AgentGrid.tsx   # Specialist agent card grid
-│   │   │   ├── Timeline.tsx    # Chronological timeline logs
-│   │   │   └── Faq.tsx         # FAQ accordions detailing Soroban contracts
-│   │   └── dashboard/
-│   │       ├── DashboardSidebar.tsx # Minimal navigation with XLM balance widgets
-│   │       ├── OrchestratorConsole.tsx # Monospace scrolling terminal streaming logs
-│   │       ├── DeliverableTabs.tsx # Inspection tabs for venture artifacts
-│   │       └── WalletLedger.tsx # Detailed table listing Stellar transactions
+│   │   ├── game/
+│   │   │   ├── HandCanvas.tsx      # SVG Vector Hand & Seeded Number Engine
+│   │   │   ├── TargetBanner.tsx    # Live HUD (Find target, Timer, Acc %, Progress)
+│   │   │   ├── CountdownOverlay.tsx# 3-2-1 GO countdown overlay
+│   │   │   ├── GameScreen.tsx      # Game Screen container & AI loop runner
+│   │   │   └── ResultsModal.tsx    # Post-match victory/defeat & STX stats
+│   │   ├── lobby/
+│   │   │   └── WaitingLobby.tsx    # Room lobby code sharing, player ready status, chat
+│   │   ├── dashboard/
+│   │   │   ├── HomeDashboard.tsx   # Dashboard home screen with quick-play cards
+│   │   │   ├── LeaderboardView.tsx # Daily, Weekly, Global rankings
+│   │   │   ├── WalletDrawer.tsx    # STX balance & Leather wallet connection
+│   │   │   └── ProfileView.tsx     # Player rank, lifetime stats, NFT badges
+│   │   └── landing/
+│   │       └── LandingHero.tsx     # Product landing hero section
 │   ├── lib/
-│   │   ├── store.ts            # Zustand orchestration and contract settlement state
-│   │   └── utils.ts            # Classnames clsx/tailwind-merge utility
+│   │   ├── game-engine/
+│   │   │   ├── prng.ts         # Mulberry32 PRNG seed generator
+│   │   │   ├── placement.ts    # Hand zone bounding & collision avoidance algorithm
+│   │   │   └── ai-bot.ts       # AI reaction time distribution & mistake simulator
+│   │   ├── wallet/
+│   │   │   └── stacks.ts       # Leather wallet helper & guest fallback
+│   │   └── store/
+│   │       └── gameStore.ts    # Zustand global game state & score tracking
 ├── package.json
 └── tsconfig.json
 ```
 
 ---
 
-## 7. Getting Started
+## 🚀 Getting Started
 
-### Smart Contract Setup
+### Prerequisites
+- Node.js (v18+ or v20+)
+- npm or pnpm package manager
 
-#### Prerequisites
-* Install Rust and Cargo: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
-* Add target WASM: `rustup target add wasm32-unknown-unknown`
-* Install the Stellar CLI: `cargo install --locked stellar-cli --features opt`
+### Installation & Run
 
-#### Building Contracts
-Compile the escrow contract to target bytecode:
-```bash
-cd contracts/escrow
-cargo build --target wasm32-unknown-unknown --release
-```
+1. Clone the repository and install dependencies:
+   ```bash
+   npm install
+   ```
 
-#### Optimizing Contract Wasm
-Optimize the compiled WASM binary for minimal ledger size limits:
-```bash
-stellar contract optimize --wasm target/wasm32-unknown-unknown/release/soroban_agent_escrow.wasm
-```
+2. Start the local development server:
+   ```bash
+   npm run dev
+   ```
 
-#### Deploying to Stellar Testnet
-Deploy optimized WASM contract bytecodes to Testnet network:
-```bash
-stellar contract deploy \
-  --wasm target/wasm32-unknown-unknown/release/soroban_agent_escrow.optimized.wasm \
-  --source your_stellar_account \
-  --network testnet
-```
+3. Open `http://localhost:3000` in your web browser.
 
 ---
 
-### Frontend Setup
+## 📄 License
 
-#### Prerequisites
-* Node.js (version 18.0.0 or higher)
-* npm or pnpm package manager
-
-#### Installation
-Install all venture dependencies:
-```bash
-npm install
-```
-
-#### Running Locally
-Execute the Next.js development server:
-```bash
-npm run dev
-```
-
-Open `http://localhost:3000` in your web browser to interact with the landing page and launch dashboard.
-
----
-
-## 8. Open Source Contributions
-
-We welcome active contributions from the developer community! Here is how you can get involved:
-
-### How to Contribute
-1. **Fork the Repository**: Clone Arlo and create a new feature branch (`git checkout -b feature/your-feature-name`).
-2. **Add Custom Agents**: Extend `INITIAL_AGENTS` in `src/lib/store.ts` to add specialized agents. Specify their roles, color tokens, and base XLM rates.
-3. **Enhance Escrow Logic**: Open issues or PRs inside `contracts/escrow/src/lib.rs` to support multi-signature escrows, oracle verification triggers, or dynamic fee logic.
-4. **Submit PRs**: Ensure all code compiles cleanly and matches project styling. Submit a detailed pull request description to the main branch.
-
----
-
-## 9. License
-
-This project is licensed under the MIT License. Details can be found in the LICENSE file.
-<!-- docs: add note about testnet faucet funding -->
-<!-- docs: add prerequisite list: Node 20+, Rust 1.70+, Stellar CLI -->
-<!-- docs: add link to Stellar testnet explorer for deployed contracts -->
-
+This project is licensed under the MIT License.
