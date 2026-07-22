@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { AIDifficulty } from "../game-engine/ai-bot";
 import { WalletState, GUEST_INITIAL_STATE } from "../wallet/stacks";
+import { sound } from "../audio/sound";
 
 export type ScreenType =
   | "LANDING"
@@ -31,6 +32,13 @@ export interface TapRecord {
   ms: number;
 }
 
+export interface RoundResult {
+  round: number;
+  playerScore: number;
+  opponentScore: number;
+  winner: "player" | "opponent";
+}
+
 export interface PlayerStats {
   gamesPlayed: number;
   wins: number;
@@ -41,17 +49,27 @@ export interface PlayerStats {
 }
 
 export interface GameStoreState {
-  // Navigation & Screen State
+  // Navigation & Sound
   activeScreen: ScreenType;
   setActiveScreen: (screen: ScreenType) => void;
+  soundEnabled: boolean;
+  toggleSound: () => void;
 
-  // Active Mode & Config
+  // Active Mode & AI Config
   gameMode: GameMode;
   aiDifficulty: AIDifficulty;
   setGameMode: (mode: GameMode) => void;
   setAIDifficulty: (diff: AIDifficulty) => void;
 
-  // Game Engine State
+  // 3-Round System State
+  currentRound: number;
+  maxRounds: number;
+  playerRoundWins: number;
+  opponentRoundWins: number;
+  roundScores: RoundResult[];
+  roundTimeLeft: number; // 60 seconds countdown per round
+
+  // Single Round Engine State
   status: GameStatus;
   seed: string;
   maxNumber: number;
@@ -61,7 +79,7 @@ export interface GameStoreState {
   playerScore: number;
   opponentScore: number;
   wrongTaps: number;
-  playerHp: number; // For Survival mode
+  playerHp: number;
   startTime: number;
   elapsedMs: number;
   tapHistory: TapRecord[];
@@ -82,20 +100,24 @@ export interface GameStoreState {
   country: string;
   rankName: string;
   stats: PlayerStats;
+  isWithdrawalModalOpen: boolean;
+  setWithdrawalModalOpen: (open: boolean) => void;
+  handleWithdrawal: (address: string, amount: number) => boolean;
 
   // Actions
   setWallet: (wallet: WalletState) => void;
   setUsername: (name: string) => void;
 
-  // Game Lifecycle Actions
+  // Lifecycle & Round Actions
   initGame: (mode?: GameMode, customSeed?: string) => void;
   startCountdown: () => void;
   startGameplay: () => void;
+  tickRoundTimer: () => void;
   handleTapNumber: (num: number) => boolean;
   handleOpponentProgress: (score: number) => void;
+  endRound: () => void;
   pauseGame: () => void;
   resumeGame: () => void;
-  endGame: (winner: "player" | "opponent") => void;
 
   // Lobby Actions
   createRoom: () => void;
@@ -104,14 +126,32 @@ export interface GameStoreState {
 }
 
 export const useGameStore = create<GameStoreState>((set, get) => ({
-  // Defaults
+  // Navigation & Sound
   activeScreen: "LANDING",
-  setActiveScreen: (screen) => set({ activeScreen: screen }),
+  setActiveScreen: (screen) => {
+    sound.playButtonClick();
+    set({ activeScreen: screen });
+  },
+
+  soundEnabled: true,
+  toggleSound: () => {
+    const next = !get().soundEnabled;
+    sound.setMuted(!next);
+    set({ soundEnabled: next });
+  },
 
   gameMode: "ai",
   aiDifficulty: "medium",
   setGameMode: (mode) => set({ gameMode: mode }),
   setAIDifficulty: (diff) => set({ aiDifficulty: diff }),
+
+  // 3 Rounds defaults
+  currentRound: 1,
+  maxRounds: 3,
+  playerRoundWins: 0,
+  opponentRoundWins: 0,
+  roundScores: [],
+  roundTimeLeft: 60,
 
   status: "IDLE",
   seed: "ARLO-SEED-88",
@@ -148,6 +188,24 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     totalStxWon: 14.8,
     streak: 5,
   },
+  isWithdrawalModalOpen: false,
+  setWithdrawalModalOpen: (open) => set({ isWithdrawalModalOpen: open }),
+
+  handleWithdrawal: (address, amount) => {
+    const { wallet } = get();
+    if (amount <= 0 || amount > wallet.stxBalance || !address) {
+      return false;
+    }
+    const newBal = Number((wallet.stxBalance - amount).toFixed(3));
+    set({
+      wallet: {
+        ...wallet,
+        stxBalance: newBal,
+      },
+    });
+    sound.playVictoryFanfare();
+    return true;
+  },
 
   setWallet: (wallet) => set({ wallet }),
   setUsername: (name) => set({ username: name }),
@@ -181,6 +239,14 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       tapHistory: [],
       winner: null,
       stxEarned: 0,
+
+      // Reset 3 Rounds state
+      currentRound: 1,
+      playerRoundWins: 0,
+      opponentRoundWins: 0,
+      roundScores: [],
+      roundTimeLeft: 60,
+
       status: activeMode === "online" || activeMode === "tournament" ? "LOBBY" : "COUNTDOWN",
     });
   },
@@ -191,7 +257,20 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     set({
       status: "PLAYING",
       startTime: Date.now(),
+      roundTimeLeft: 60,
     }),
+
+  tickRoundTimer: () => {
+    const state = get();
+    if (state.status !== "PLAYING") return;
+
+    if (state.roundTimeLeft <= 1) {
+      // 60-Second Round Time Expired!
+      state.endRound();
+    } else {
+      set({ roundTimeLeft: state.roundTimeLeft - 1 });
+    }
+  },
 
   handleTapNumber: (num) => {
     const state = get();
@@ -200,10 +279,12 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     const expected = state.currentTargetNumber;
 
     if (num === expected) {
+      sound.playCorrectTap();
       const now = Date.now();
-      const lastTapTime = state.tapHistory.length > 0
-        ? state.startTime + state.tapHistory.reduce((acc, t) => acc + t.ms, 0)
-        : state.startTime;
+      const lastTapTime =
+        state.tapHistory.length > 0
+          ? state.startTime + state.tapHistory.reduce((acc, t) => acc + t.ms, 0)
+          : state.startTime;
 
       const reactionTime = Math.max(80, now - lastTapTime);
       const updatedTapHistory = [...state.tapHistory, { target: num, ms: reactionTime }];
@@ -211,31 +292,14 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       const newScore = state.playerScore + 1;
 
       if (nextIndex >= state.targetSequence.length) {
-        // Game Won!
-        const totalElapsed = now - state.startTime;
-        const stxEarned = state.gameMode === "online" || state.gameMode === "tournament" ? state.stxStake * 1.8 : 0.05;
-
+        // All target numbers found for this round!
         set({
           playerScore: newScore,
           currentStepIndex: nextIndex,
           tapHistory: updatedTapHistory,
-          elapsedMs: totalElapsed,
-          winner: "player",
-          stxEarned,
-          status: "GAME_OVER",
-          activeScreen: "RESULTS",
-          stats: {
-            ...state.stats,
-            gamesPlayed: state.stats.gamesPlayed + 1,
-            wins: state.stats.wins + 1,
-            bestTimeMs: state.stats.bestTimeMs === 0 ? totalElapsed : Math.min(state.stats.bestTimeMs, totalElapsed),
-            totalStxWon: Number((state.stats.totalStxWon + stxEarned).toFixed(2)),
-          },
-          wallet: {
-            ...state.wallet,
-            stxBalance: Number((state.wallet.stxBalance + stxEarned).toFixed(2)),
-          },
+          elapsedMs: now - state.startTime,
         });
+        state.endRound();
         return true;
       } else {
         const nextTarget = state.targetSequence[nextIndex];
@@ -250,22 +314,15 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       }
     } else {
       // Wrong Tap!
+      sound.playWrongTap();
       const updatedWrongTaps = state.wrongTaps + 1;
       let newHp = state.playerHp;
 
       if (state.gameMode === "survival") {
         newHp = state.playerHp - 1;
         if (newHp <= 0) {
-          // Game Over (Survival HP exhausted)
-          const totalElapsed = Date.now() - state.startTime;
-          set({
-            wrongTaps: updatedWrongTaps,
-            playerHp: 0,
-            elapsedMs: totalElapsed,
-            winner: "opponent",
-            status: "GAME_OVER",
-            activeScreen: "RESULTS",
-          });
+          set({ wrongTaps: updatedWrongTaps, playerHp: 0 });
+          state.endRound();
           return false;
         }
       }
@@ -280,30 +337,120 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     if (state.status !== "PLAYING") return;
 
     if (score >= state.targetSequence.length) {
-      // Opponent Wins!
-      const totalElapsed = Date.now() - state.startTime;
-      set({
-        opponentScore: score,
-        elapsedMs: totalElapsed,
-        winner: "opponent",
-        status: "GAME_OVER",
-        activeScreen: "RESULTS",
-        stats: {
-          ...state.stats,
-          gamesPlayed: state.stats.gamesPlayed + 1,
-        },
-      });
+      set({ opponentScore: score });
+      state.endRound();
     } else {
       set({ opponentScore: score });
     }
   },
 
-  pauseGame: () => set({ status: "PAUSED" }),
-  resumeGame: () => set({ status: "PLAYING" }),
+  endRound: () => {
+    const state = get();
+    if (state.status === "GAME_OVER") return;
 
-  endGame: (winner) => set({ status: "GAME_OVER", winner, activeScreen: "RESULTS" }),
+    // Determine round winner: Player wins if playerScore > opponentScore, or if equal, fewer wrong taps
+    const isPlayerRoundWin =
+      state.playerScore > state.opponentScore ||
+      (state.playerScore === state.opponentScore && state.wrongTaps <= 0);
+
+    const roundWinner: "player" | "opponent" = isPlayerRoundWin ? "player" : "opponent";
+
+    const newPlayerWins = isPlayerRoundWin ? state.playerRoundWins + 1 : state.playerRoundWins;
+    const newOpponentWins = !isPlayerRoundWin ? state.opponentRoundWins + 1 : state.opponentRoundWins;
+
+    const updatedRoundScores: RoundResult[] = [
+      ...state.roundScores,
+      {
+        round: state.currentRound,
+        playerScore: state.playerScore,
+        opponentScore: state.opponentScore,
+        winner: roundWinner,
+      },
+    ];
+
+    // Check overall match winner (Best of 3: first to 2 wins, or after 3 rounds)
+    const matchFinished =
+      newPlayerWins >= 2 || newOpponentWins >= 2 || state.currentRound >= state.maxRounds;
+
+    if (matchFinished) {
+      const overallWinner: "player" | "opponent" =
+        newPlayerWins > newOpponentWins ? "player" : "opponent";
+
+      const totalElapsed = Date.now() - state.startTime;
+      const stxAward = overallWinner === "player" ? 0.001 : 0; // 0.001 STX reward on victory!
+
+      if (overallWinner === "player") {
+        sound.playVictoryFanfare();
+      } else {
+        sound.playDefeatSound();
+      }
+
+      set({
+        playerRoundWins: newPlayerWins,
+        opponentRoundWins: newOpponentWins,
+        roundScores: updatedRoundScores,
+        winner: overallWinner,
+        stxEarned: stxAward,
+        status: "GAME_OVER",
+        activeScreen: "RESULTS",
+        stats: {
+          ...state.stats,
+          gamesPlayed: state.stats.gamesPlayed + 1,
+          wins: overallWinner === "player" ? state.stats.wins + 1 : state.stats.wins,
+          bestTimeMs:
+            overallWinner === "player"
+              ? state.stats.bestTimeMs === 0
+                ? totalElapsed
+                : Math.min(state.stats.bestTimeMs, totalElapsed)
+              : state.stats.bestTimeMs,
+          totalStxWon: Number((state.stats.totalStxWon + stxAward).toFixed(3)),
+        },
+        wallet: {
+          ...state.wallet,
+          stxBalance: Number((state.wallet.stxBalance + stxAward).toFixed(3)),
+        },
+      });
+    } else {
+      // Advance to Next Round (Round 2 or Round 3)
+      const nextRound = state.currentRound + 1;
+      const newRoundSeed = `ARLO-R${nextRound}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+
+      let seq = Array.from({ length: state.maxNumber }, (_, i) => i + 1);
+      if (state.gameMode === "reverse") {
+        seq = Array.from({ length: state.maxNumber }, (_, i) => state.maxNumber - i);
+      }
+
+      set({
+        currentRound: nextRound,
+        playerRoundWins: newPlayerWins,
+        opponentRoundWins: newOpponentWins,
+        roundScores: updatedRoundScores,
+        seed: newRoundSeed,
+        currentTargetNumber: seq[0],
+        targetSequence: seq,
+        currentStepIndex: 0,
+        playerScore: 0,
+        opponentScore: 0,
+        wrongTaps: 0,
+        playerHp: 3,
+        roundTimeLeft: 60,
+        status: "COUNTDOWN",
+      });
+    }
+  },
+
+  pauseGame: () => {
+    sound.playButtonClick();
+    set({ status: "PAUSED" });
+  },
+
+  resumeGame: () => {
+    sound.playButtonClick();
+    set({ status: "PLAYING" });
+  },
 
   createRoom: () => {
+    sound.playButtonClick();
     const code = `ARLO-${Math.floor(1000 + Math.random() * 9000)}`;
     set({
       roomCode: code,
@@ -317,6 +464,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
 
   joinRoom: (code) => {
+    sound.playButtonClick();
     set({
       roomCode: code.toUpperCase(),
       isHost: false,
@@ -329,6 +477,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
 
   toggleReady: () => {
+    sound.playButtonClick();
     const newReady = !get().isReady;
     set({ isReady: newReady });
     if (newReady && get().opponentReady) {
