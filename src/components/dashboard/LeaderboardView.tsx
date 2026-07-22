@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useGameStore } from "../../lib/store/gameStore";
-import { Trophy, ArrowLeft, Meda1 as Medal, Zap, Clock } from "lucide-react";
+import { Trophy, ArrowLeft, Medal, Zap, Clock } from "lucide-react";
 
 export const LeaderboardView: React.FC = () => {
   const { setActiveScreen } = useGameStore();
